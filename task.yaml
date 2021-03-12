@@ -1,0 +1,45 @@
+--- 
+ - name: launch ec2 instance
+   hosts: localhost
+   vars:
+     count: 2
+     var: ec2.instances
+   tasks:
+      - copy:
+          content: |
+            [master]
+            [node]
+          dest: ./inventory
+      - name: master
+        ec2:
+          key_name: linux
+          instance_type: t2.micro
+          image: ami-02354e95b39ca8dec
+          region: us-east-1
+          count: 1
+          wait: yes
+          instance_tags: 
+              Name: master
+        register: ec2
+      - lineinfile:
+         path: ./inventory
+         line: "{{item.private_ip}}"
+         insertafter: "[master]"
+         firstmatch: yes
+        with_items: "{{ec2.instances}}"
+      - name: node
+        ec2:
+          key_name: linux
+          instance_type: t2.micro
+          image: ami-02354e95b39ca8dec
+          region: us-east-1
+          count: "{{count}}"
+          wait: yes
+          instance_tags:
+              Name: node
+        register: ec21
+      - lineinfile:
+         path: ./inventory
+         line: "{{item.private_ip}}"
+         insertafter: "[node]"
+        with_items: "{{ec21.instances}}"
