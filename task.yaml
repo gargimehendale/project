@@ -16,7 +16,7 @@
           instance_type: t2.micro
           image: ami-02354e95b39ca8dec
           region: us-east-1
-          count: 1
+          count: 2
           wait: yes
           instance_tags: 
               Name: master
