@@ -1,4 +1,2 @@
 # project
-123....121
-df
-345
+add host_key_checking=false on controller node
