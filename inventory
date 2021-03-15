@@ -1,0 +1,4 @@
+[master]
+172.31.71.209 ansible_conection=ssh ansible_user=ansible ansible_ssh_pass=redhat
+[node]
+172.31.72.248 ansible_conection=ssh ansible_user=ansible ansible_ssh_pass=redhat

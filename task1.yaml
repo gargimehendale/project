@@ -21,10 +21,19 @@
           wait: yes
           instance_tags: 
               Name: master
+          user_data: |
+                     #!/bin/bash
+                     sudo useradd ansible
+                     PASSWD="ansible"
+                     sudo echo ${PASSWD} | passwd --stdin ansible
+                     sudo echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                     sudo sed -i 'PasswordAuthentication yes/s/^#//' /etc/ssh/sshd_config
+                     sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/g" /etc/ssh/sshd_config
+                     sudo systemctl restart sshd
         register: ec2
       - lineinfile:
          path: ./inventory
-         line: "{{item.private_ip}}"
+         line: "{{item.private_ip}} ansible_connection=ssh ansible_user=ansible ansible_ssh_pass=ansible"
          insertafter: "[master]"
          firstmatch: yes
         with_items: "{{ec2.instances}}"
@@ -39,9 +48,18 @@
           wait: yes
           instance_tags:
               Name: node
+          user_data: |
+                     #!/bin/bash
+                     sudo useradd ansible
+                     PASSWD="ansible"
+                     sudo echo ${PASSWD} | passwd --stdin ansible
+                     sudo echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                     sudo sed -i 'PasswordAuthentication yes/s/^#//' /etc/ssh/sshd_config
+                     sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/g" /etc/ssh/sshd_config
+                     sudo systemctl restart sshd
         register: ec21
       - lineinfile:
          path: ./inventory
-         line: "{{item.private_ip}}"
+         line: "{{item.private_ip}} ansible_connection=ssh ansible_user=ansible ansible_ssh_pass=ansible"
          insertafter: "[node]"
         with_items: "{{ec21.instances}}"
