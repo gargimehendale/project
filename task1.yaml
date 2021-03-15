@@ -13,7 +13,7 @@
       - name: master
         ec2:
           key_name: newkey
-          instance_type: t2.micro
+          instance_type: t2.xlarge
           image: ami-02354e95b39ca8dec
           region: us-east-1
           group: securegroup
@@ -40,7 +40,7 @@
       - name: node
         ec2:
           key_name: newkey
-          instance_type: t2.micro
+          instance_type: t2.xlarge
           image: ami-02354e95b39ca8dec
           region: us-east-1
           count: "{{count}}"
