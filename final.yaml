@@ -1,0 +1,136 @@
+---
+ - name: launch_ec2_instance
+   hosts: localhost
+   vars:
+     count: 2
+     var: ec2.instances
+   tasks:
+      - copy:
+          content: |
+            [master]
+            [node]
+          dest: ./inventory
+      - name: master
+        ec2:
+          key_name: newkey
+          instance_type: t2.xlarge
+          image: ami-02354e95b39ca8dec
+          region: us-east-1
+          group: securegroup
+          count: 1
+          wait: yes
+          instance_tags:
+              Name: master
+          user_data: |
+                     #!/bin/bash
+                     sudo useradd ansible 
+                     PASSWD="ansible"
+                     sudo echo ${PASSWD} | passwd --stdin ansible
+                     sudo echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                     sudo sed -i 'PasswordAuthentication yes/s/^#//' /etc/ssh/sshd_config
+                     sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/g" /etc/ssh/sshd_config
+                     sudo systemctl restart sshd
+        register: ec2
+      - lineinfile:
+         path: ./inventory
+         line: "{{item.private_ip}} ansible_connection=ssh ansible_user=ansible ansible_ssh_pass=ansible"
+         insertafter: "[master]"
+         firstmatch: yes
+        with_items: "{{ec2.instances}}"
+      - name: node
+        ec2:
+          key_name: newkey
+          instance_type: t2.xlarge
+          image: ami-02354e95b39ca8dec
+          region: us-east-1
+          count: "{{count}}"
+          group: securegroup
+          wait: yes
+          instance_tags:
+              Name: node
+          user_data: |
+                     #!/bin/bash
+                     sudo useradd ansible
+                     PASSWD="ansible"
+                     sudo echo ${PASSWD} | passwd --stdin ansible
+                     sudo echo "ansible ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                     sudo sed -i 'PasswordAuthentication yes/s/^#//' /etc/ssh/sshd_config
+                     sudo sed -i "s/PasswordAuthentication no/#PasswordAuthentication no/g" /etc/ssh/sshd_config
+                     sudo systemctl restart sshd
+        register: ec21
+      - lineinfile:
+         path: ./inventory
+         line: "{{item.private_ip}} ansible_connection=ssh ansible_user=ansible ansible_ssh_pass=ansible"
+         insertafter: "[node]"
+        with_items: "{{ec21.instances}}"
+ - name: kubernetes_file
+   hosts: all
+   become: yes
+   tasks:
+      - name: swap_off
+        mount:
+          name: "{{ item }}"
+          fstype: swap
+          state: absent
+        with_items:
+          - swap
+      - name: repo_add
+        yum_repository:
+          name: kubernetes
+          description: kubernetes
+          baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+          enabled: yes
+          gpgcheck: yes
+          repo_gpgcheck: yes
+          gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      - name: install "{{ item }}"
+        yum:
+          name: "{{ item }}"
+          state: present
+        with_items:
+          - docker
+          - kubelet
+          - kubectl
+          - kubeadm
+      - name: service "{{ item }}" start
+        service:
+          name: "{{ item }}"
+          state: started
+          enabled: yes
+        with_items:
+          - kubelet
+          - docker
+
+ - name: master_configuration
+   hosts: master
+   become: yes
+   tasks:
+      - name: initialize_master
+        shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+        args:
+          chdir: $HOME
+          creates: cluster_initialized.txt
+
+      - name: create_.kube_directory
+        become: yes
+        become_user: ansible
+        file:
+          path: $HOME/.kube
+          state: directory
+          mode: 0755
+
+      - name: copy admin.conf to user's kube config
+        copy:
+          src: /etc/kubernetes/admin.conf
+          dest: /home/ansible/.kube/config
+          remote_src: yes
+          owner: ansible
+
+      - name: install Pod network
+        become: yes
+        become_user: ansible
+        shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+        args:
+          chdir: $HOME
+          creates: pod_network_setup.txt
+
