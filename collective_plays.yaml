@@ -70,10 +70,10 @@
         meta: refresh_inventory
       - name: making host_key_checking False
         shell: 
-         cmd: sudo sed -i "s/#host_key_checking = False/host_key_checking = False/g" /etc/ansible/ansible.cfg
+         cmd: sed -i "s/#host_key_checking = False/host_key_checking = False/g" /etc/ansible/ansible.cfg
       - name: adding inventory path 
         shell:
-         cmd: sudo  sed -i '14 a inventory = /var/lib/jenkins/workspace/yamlpoll' /etc/ansible/ansible.cfg
+         cmd: sed -i "14 a inventory = /var/lib/jenkins/workspace/yamlpoll" /etc/ansible/ansible.cfg
 
  - name: kubernetes_file
    hosts: all
