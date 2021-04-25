@@ -67,7 +67,7 @@
         copy:
          content: |
                   [default]
-                  inventory = ./inventory
+                  inventory = /var/lib/jenkins/workspace/yamlpoll/inventory
                   host_key_checking = False
          dest: ./ansible.cfg
       - name: pause play
