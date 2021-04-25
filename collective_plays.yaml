@@ -70,10 +70,12 @@
         meta: refresh_inventory
       - name: making host_key_checking False
         become: yes
+        become_user: centos
         shell: 
          cmd: sed -i "s/#host_key_checking = False/host_key_checking = False/g" /etc/ansible/ansible.cfg
       - name: adding inventory path 
         become: yes
+        become_user: centos
         shell:
          cmd: sed -i "14 a inventory = /var/lib/jenkins/workspace/yamlpoll" /etc/ansible/ansible.cfg
 
