@@ -63,19 +63,18 @@
          line: "{{item.private_ip}} ansible_connection=ssh ansible_user=ansible ansible_ssh_pass=ansible"
          insertafter: "[node]"
         with_items: "{{ec21.instances}}"
+      - name: creating ansible.cfg
+        copy:
+         content: |
+                  [default]
+                  inventory = ./inventory
+                  host_key_checking = False
+         dest: ./ansible.cfg
       - name: pause play
         pause:
          minutes: 1
       - name: refresh inventory
         meta: refresh_inventory
-      - name: making host_key_checking False
-        become: yes
-        shell: 
-         cmd: sed -i "s/#host_key_checking = False/host_key_checking = False/g" /etc/ansible/ansible.cfg
-      - name: adding inventory path 
-        become: yes
-        shell:
-         cmd: sed -i "14 a inventory = /var/lib/jenkins/workspace/yamlpoll" /etc/ansible/ansible.cfg
 
  - name: kubernetes_file
    hosts: all
