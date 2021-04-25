@@ -66,8 +66,8 @@
       - name: creating ansible.cfg
         copy:
          content: |
-                  [default]
-                  inventory = /var/lib/jenkins/workspace/yamlpoll/inventory
+                  [defaults]
+                  inventory = inventory
                   host_key_checking = False
          dest: ./ansible.cfg
       - name: pause play
