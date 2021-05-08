@@ -171,12 +171,10 @@
         
  - name: add repo and install kubectl
    hosts: localhost
-   vars: 
-     - localhost_user: centos
    tasks:
      - name: create_.kube_directory
        file:
-          path: /home/{{localhost_user}}/.kube
+          path: $HOME/.kube
           state: directory
           mode: 0755
      - name: repo_add
@@ -200,11 +198,9 @@
  - name: fetching the kube config file
    hosts: master
    become: yes
-   vars:
-     - localhost_user: centos
    tasks:
      - name: copy
        fetch:
          src: /home/ansible/.kube/config
-         dest: /home/{{localhost_user}}/.kube/config
+         dest: $HOME/.kube/config
          flat: yes
