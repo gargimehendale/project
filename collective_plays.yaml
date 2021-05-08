@@ -171,10 +171,12 @@
         
  - name: add repo and install kubectl
    hosts: localhost
+   vars: 
+       localhost_user: centos
    tasks:
      - name: create_.kube_directory
        file:
-          path: $HOME/.kube
+          path: /home/{{localhost_user}}/.kube
           state: directory
           mode: 0755
      - name: repo_add
@@ -202,5 +204,12 @@
      - name: copy
        fetch:
          src: /home/ansible/.kube/config
-         dest: $HOME/.kube/config
+         dest: ./config
          flat: yes
+ - name: copy conf file
+   vars: 
+     - localhost_user: centos
+   hosts: localhost
+   become: yes
+   tasks: 
+     - shell: mv /var/lib/jenkins/workspace/yamlpoll/config /home/{{localhost_user}}/.kube/
