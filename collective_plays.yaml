@@ -175,6 +175,7 @@
        localhost_user: centos
    tasks:
      - name: create_.kube_directory
+       become: yes
        file:
           path: /home/{{localhost_user}}/.kube
           state: directory
