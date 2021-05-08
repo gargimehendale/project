@@ -195,13 +195,13 @@
        with_items:
           - kubectl
      
-- name: fetching the kube config file
-  hosts: master
-  vars:
-    - localhost_user: centos
-  tasks:
-    - name: copy
-      fetch:
-        src: /home/ansible/.kube/config
-        dest: /home/{{localhost_user}}/.kube/
-        flat: yes
+ - name: fetching the kube config file
+   hosts: master
+   vars:
+     - localhost_user: centos
+   tasks:
+     - name: copy
+       fetch:
+         src: /home/ansible/.kube/config
+         dest: /home/{{localhost_user}}/.kube/
+         flat: yes
