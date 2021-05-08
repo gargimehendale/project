@@ -171,10 +171,12 @@
         
  - name: add repo and install kubectl
    hosts: localhost
+   vars: 
+     - localhost_user: centos
    tasks:
      - name: create_.kube_directory
        file:
-          path: {{localhost_user))/.kube
+          path: /home/{{localhost_user))/.kube
           state: directory
           mode: 0755
      - name: repo_add
