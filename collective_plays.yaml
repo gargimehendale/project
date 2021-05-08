@@ -199,11 +199,12 @@
      
  - name: fetching the kube config file
    hosts: master
+   become: yes
    vars:
      - localhost_user: centos
    tasks:
      - name: copy
        fetch:
          src: /home/ansible/.kube/config
-         dest: /home/{{localhost_user}}/.kube/
+         dest: /home/{{localhost_user}}/.kube/config
          flat: yes
