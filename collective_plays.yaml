@@ -169,9 +169,8 @@
     - debug:
         msg: "{{ joined_or_not.stdout }}"
         
- - name: copying kube.conf file
+ - name: add repo and install kubectl
    hosts: localhost
-   become: yes
    tasks:
      - name: create_.kube_directory
        file:
@@ -179,6 +178,7 @@
           state: directory
           mode: 0755
      - name: repo_add
+       become: yes
        yum_repository:
           name: kubernetes
           description: kubernetes
@@ -188,15 +188,20 @@
           repo_gpgcheck: yes
           gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
      - name: install "{{ item }}"
+       become: yes
        yum:
           name: "{{ item }}"
           state: present
        with_items:
           - kubectl
-     - name: fetch config file
-       run_once: yes
-       fetch:
-          src: /home/ansible/.kube/config
-          dest: $HOME/.kube/
-          flat: yes
-
+     
+- name: fetching the kube config file
+  hosts: master
+  vars:
+    - localhost_user: centos
+  tasks:
+    - name: copy
+      fetch:
+        src: /home/ansible/.kube/config
+        dest: /home/{{localhost_user}}/.kube/
+        flat: yes
