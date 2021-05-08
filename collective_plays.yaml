@@ -174,7 +174,7 @@
    tasks:
      - name: create_.kube_directory
        file:
-          path: $HOME/.kube
+          path: {{localhost_user))/.kube
           state: directory
           mode: 0755
      - name: repo_add
