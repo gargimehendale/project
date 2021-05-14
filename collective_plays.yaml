@@ -2,7 +2,7 @@
  - name: launch_ec2_instance
    hosts: localhost
    vars:
-     count: 1
+     count: 2
      var: ec2.instances
    tasks:
       - copy:
