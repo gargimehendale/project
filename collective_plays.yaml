@@ -12,7 +12,7 @@
           dest: ./inventory
       - name: master
         ec2:
-          key_name: mehendalegargi_aws
+          key_name: newkey
           instance_type: t2.medium
           image: ami-0015b9ef68c77328d
           region: us-east-1
@@ -39,7 +39,7 @@
         with_items: "{{ec2.instances}}"
       - name: node
         ec2:
-          key_name: mehenddalegargi_aws
+          key_name: newkey
           instance_type: t2.medium
           image: ami-0015b9ef68c77328d
           region: us-east-1
