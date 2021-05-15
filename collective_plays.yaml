@@ -12,9 +12,9 @@
           dest: ./inventory
       - name: master
         ec2:
-          key_name: newkey
-          instance_type: t2.xlarge
-          image: ami-02354e95b39ca8dec
+          key_name: mehendalegargi_aws
+          instance_type: t2.medium
+          image: ami-0015b9ef68c77328d
           region: us-east-1
           group: securegroup
           count: 1
@@ -39,9 +39,9 @@
         with_items: "{{ec2.instances}}"
       - name: node
         ec2:
-          key_name: newkey
-          instance_type: t2.xlarge
-          image: ami-02354e95b39ca8dec
+          key_name: mehenddalegargi_aws
+          instance_type: t2.medium
+          image: ami-0015b9ef68c77328d
           region: us-east-1
           count: "{{count}}"
           group: securegroup
