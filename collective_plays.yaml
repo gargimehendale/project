@@ -87,6 +87,8 @@
           state: absent
         with_items:
           - swap
+      - name: swapoff
+        shell: swapoff -a
       - name: repo_add
         yum_repository:
           name: kubernetes
